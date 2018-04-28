@@ -2340,7 +2340,7 @@ describe AnnotateModels do # rubocop:disable Metrics/BlockLength
 
   describe '.resolve_filename' do
     subject do
-      AnnotateModels.resolve_filename(filename_template, model_name, table_name)
+      AnnotateModels.send(:resolve_filename, filename_template, model_name, table_name)
     end
 
     context 'When model_name is "example_model" and table_name is "example_models"' do
