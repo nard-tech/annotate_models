@@ -1,18 +1,13 @@
 name: CI
 on:
   push:
-    branches:
-      - '*'
+    tags:
+      - 'release/v*'
 
 jobs:
-  test:
+  release:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        ruby:
-          - 2.3.x
-          - 2.4.x
-          - 2.6.x
+
     steps:
       - name: Checkout
         uses: actions/checkout@v1
@@ -20,7 +15,7 @@ jobs:
       - name: Setup Ruby
         uses: actions/setup-ruby@v1
         with:
-          ruby-version: ${{ matrix.ruby }}
+          ruby-version: 2.6.x
 
       - name: Bundle
         run: |
@@ -28,5 +23,5 @@ jobs:
           gem update bundler
           bundle install --jobs 4 --retry 3
 
-      - name: Test
+      - name: Publish
         run: bundle exec rubocop && bundle exec rspec
