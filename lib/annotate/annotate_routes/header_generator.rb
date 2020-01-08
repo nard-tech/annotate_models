@@ -6,6 +6,8 @@ module AnnotateRoutes
     PREFIX_MD = '## Route Map'.freeze
     HEADER_ROW = ['Prefix', 'Verb', 'URI Pattern', 'Controller#Action'].freeze
 
+    include Helpers
+
     class << self
       def generate(options = {})
         new(options, routes_map(options)).generate
@@ -42,7 +44,7 @@ module AnnotateRoutes
     end
 
     def generate
-      magic_comments_map, contents_without_magic_comments = Helpers.extract_magic_comments_from_array(routes_map)
+      magic_comments_map, contents_without_magic_comments = extract_magic_comments_from_array(routes_map)
 
       out = []
 

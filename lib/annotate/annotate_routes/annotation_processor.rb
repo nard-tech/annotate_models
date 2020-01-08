@@ -4,11 +4,13 @@ require_relative './header_generator'
 
 module AnnotateRoutes
   class AnnotationProcessor < BaseProcessor
+    include Helpers
+
     private
 
     def generate_new_content_array(content, header_position)
       header = HeaderGenerator.generate(options)
-      magic_comments_map, content = Helpers.extract_magic_comments_from_array(content)
+      magic_comments_map, content = extract_magic_comments_from_array(content)
       if %w(before top).include?(options[:position_in_routes])
         header = header << '' if content.first != ''
         magic_comments_map << '' if magic_comments_map.any?
