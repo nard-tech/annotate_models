@@ -2,7 +2,9 @@ require_relative './base_processor'
 require_relative './helpers'
 require_relative './header_generator'
 
+# This module provides methods for annotating config/routes.rb.
 module AnnotateRoutes
+  # This class provides methods for adding annotation to config/routes.rb.
   class AnnotationProcessor < BaseProcessor
     include Helpers
 

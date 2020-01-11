@@ -1,6 +1,8 @@
 require_relative './base_processor'
 
+# This module provides methods for annotating config/routes.rb.
 module AnnotateRoutes
+  # This class provides methods for removing annotation from config/routes.rb.
   class RemovalProcessor < BaseProcessor
     # @return [String]
     def execute

@@ -1,4 +1,7 @@
+# This module provides methods for annotating config/routes.rb.
 module AnnotateRoutes
+  # This module contains methods used in multiple classes.
+  # This module is included in AnnotationProcessor and HeaderGenerator.
   module Helpers
     MAGIC_COMMENT_MATCHER = Regexp.new(/(^#\s*encoding:.*)|(^# coding:.*)|(^# -\*- coding:.*)|(^# -\*- encoding\s?:.*)|(^#\s*frozen_string_literal:.+)|(^# -\*- frozen_string_literal\s*:.+-\*-)/).freeze
 
