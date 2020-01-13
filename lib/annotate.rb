@@ -1,5 +1,5 @@
 $LOAD_PATH.unshift(File.dirname(__FILE__))
-require 'annotate/version'
+
 require 'annotate/annotate_models'
 require 'annotate/annotate_routes'
 require 'annotate/constants'
@@ -16,6 +16,7 @@ rescue StandardError
 end
 
 module Annotate
+  VERSION = '3.0.3'.freeze
   ##
   # Set default values that can be overridden via environment variables.
   #

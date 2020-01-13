@@ -163,7 +163,7 @@ module Annotate
       option_parser.on('-v',
                        '--version',
                        'Show the current version of this gem') do
-        puts "annotate v#{Annotate.version}"
+        puts "annotate v#{Annotate::VERSION}"
         @options[:exit] = true
       end
 

@@ -243,7 +243,7 @@ module Annotate # rubocop:disable Metrics/ModuleLength
     %w[-v --version].each do |option|
       describe option do
         it 'sets the ENV variable' do
-          expect { Parser.parse([option]) }.to output("annotate v#{Annotate.version}\n").to_stdout
+          expect { Parser.parse([option]) }.to output("annotate v#{Annotate::VERSION}\n").to_stdout
           expect(Parser.parse([option])).to include(exit: true)
         end
       end
