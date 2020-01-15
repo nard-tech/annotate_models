@@ -1,5 +1,5 @@
 module AnnotateModels
-  module SchemaInfo
+  module SchemaInfo # rubocop:disable Metrics/ModuleLength
     # Don't show default value for these column types
     NO_DEFAULT_COL_TYPES = %w(json jsonb hstore).freeze
 
@@ -29,7 +29,7 @@ module AnnotateModels
       # to create a comment block containing a line for
       # each column. The line contains the column name,
       # the type (and length), and any optional attributes
-      def generate(klass, header, options = {})
+      def generate(klass, header, options = {}) # rubocop:disable Metrics/MethodLength
         info = "# #{header}\n"
         info << get_schema_header_text(klass, options)
 
@@ -39,11 +39,15 @@ module AnnotateModels
         bare_type_allowance = 16
 
         if options[:format_markdown]
-          info << sprintf( "# %-#{max_size + md_names_overhead}.#{max_size + md_names_overhead}s | %-#{md_type_allowance}.#{md_type_allowance}s | %s\n", 'Name', 'Type', 'Attributes' )
-          info << "# #{ '-' * ( max_size + md_names_overhead ) } | #{'-' * md_type_allowance} | #{ '-' * 27 }\n"
+          info << format("# %-#{max_size + md_names_overhead}.#{max_size + md_names_overhead}s | %-#{md_type_allowance}.#{md_type_allowance}s | %s\n",
+                         'Name',
+                         'Type',
+                         'Attributes')
+          info << "# #{'-' * (max_size + md_names_overhead)} | #{'-' * md_type_allowance} | #{'-' * 27}\n"
         end
 
-        cols = if ignore_columns = options[:ignore_columns]
+        ignore_columns = options[:ignore_columns]
+        cols = if ignore_columns
                  klass.columns.reject do |col|
                    col.name.match(/#{ignore_columns}/)
                  end
@@ -86,14 +90,13 @@ module AnnotateModels
 
           # Check if the column has indices and print "indexed" if true
           # If the index includes another column, print it too.
-          if options[:simple_indexes] && klass.table_exists?# Check out if this column is indexed
+          if options[:simple_indexes] && klass.table_exists? # Check out if this column is indexed
             indices = retrieve_indexes_from_table(klass)
-            if indices = indices.select { |ind| ind.columns.include? col.name }
-              indices.sort_by(&:name).each do |ind|
-                next if ind.columns.is_a?(String)
-                ind = ind.columns.reject! { |i| i == col.name }
-                attrs << (ind.empty? ? "indexed" : "indexed => [#{ind.join(", ")}]")
-              end
+            indices.select { |ind| ind.columns.include? col.name }&.sort_by(&:name)&.each do |ind|
+              next if ind.columns.is_a?(String)
+
+              ind = ind.columns.reject! { |i| i == col.name }
+              attrs << (ind.empty? ? "indexed" : "indexed => [#{ind.join(', ')}]")
             end
           end
           col_name = if with_comments?(klass, options) && col.comment
@@ -102,23 +105,25 @@ module AnnotateModels
                        col.name
                      end
           if options[:format_rdoc]
-            info << sprintf("# %-#{max_size}.#{max_size}s<tt>%s</tt>", "*#{col_name}*::", attrs.unshift(col_type).join(", ")).rstrip + "\n"
+            info << format("# %-#{max_size}.#{max_size}s<tt>%s</tt>",
+                           "*#{col_name}*::",
+                           attrs.unshift(col_type).join(", ")).rstrip + "\n"
           elsif options[:format_markdown]
             name_remainder = max_size - col_name.length - non_ascii_length(col_name)
             type_remainder = (md_type_allowance - 2) - col_type.length
-            info << (sprintf("# **`%s`**%#{name_remainder}s | `%s`%#{type_remainder}s | `%s`", col_name, " ", col_type, " ", attrs.join(", ").rstrip)).gsub('``', '  ').rstrip + "\n"
+            info << (format("# **`%s`**%#{name_remainder}s | `%s`%#{type_remainder}s | `%s`",
+                            col_name,
+                            " ",
+                            col_type,
+                            " ",
+                            attrs.join(", ").rstrip).gsub('``', '  ').rstrip + "\n")
           else
             info << format_default(col_name, max_size, col_type, bare_type_allowance, attrs)
           end
         end
 
-        if options[:show_indexes] && klass.table_exists?
-          info << get_index_info(klass, options)
-        end
-
-        if options[:show_foreign_keys] && klass.table_exists?
-          info << get_foreign_key_info(klass, options)
-        end
+        info << get_index_info(klass, options) if options[:show_indexes] && klass.table_exists?
+        info << get_foreign_key_info(klass, options) if options[:show_foreign_keys] && klass.table_exists?
 
         info << get_schema_footer_text(klass, options)
       end
@@ -250,7 +255,7 @@ module AnnotateModels
         indexes = retrieve_indexes_from_table(klass)
         return '' if indexes.empty?
 
-        max_size = indexes.collect{|index| index.name.size}.max + 1
+        max_size = indexes.collect { |index| index.name.size }.max + 1
         indexes.sort_by(&:name).each do |index|
           index_info << if options[:format_markdown]
                           final_index_string_in_markdown(index)
@@ -263,7 +268,7 @@ module AnnotateModels
       end
 
       def final_index_string_in_markdown(index)
-        details = sprintf(
+        details = format(
           "%s%s%s",
           index_unique_info(index, :markdown),
           index_where_info(index, :markdown),
@@ -271,7 +276,7 @@ module AnnotateModels
         ).strip
         details = " (#{details})" unless details.blank?
 
-        sprintf(
+        format(
           "# * `%s`%s:\n#     * **`%s`**\n",
           index.name,
           details,
@@ -280,7 +285,7 @@ module AnnotateModels
       end
 
       def final_index_string(index, max_size)
-        sprintf(
+        format(
           "#  %-#{max_size}.#{max_size}s %s%s%s%s",
           index.name,
           "(#{index_columns_info(index).join(',')})",
@@ -349,9 +354,15 @@ module AnnotateModels
           constraints_info.strip!
 
           fk_info << if options[:format_markdown]
-                       sprintf("# * `%s`%s:\n#     * **`%s`**\n", format_name.call(fk), constraints_info.blank? ? '' : " (_#{constraints_info}_)", ref_info)
+                       format("# * `%s`%s:\n#     * **`%s`**\n",
+                              format_name.call(fk),
+                              constraints_info.blank? ? '' : " (_#{constraints_info}_)",
+                              ref_info)
                      else
-                       sprintf("#  %-#{max_size}.#{max_size}s %s %s", format_name.call(fk), "(#{ref_info})", constraints_info).rstrip + "\n"
+                       format("#  %-#{max_size}.#{max_size}s %s %s",
+                              format_name.call(fk),
+                              "(#{ref_info})",
+                              constraints_info).rstrip + "\n"
                      end
         end
 
@@ -370,16 +381,19 @@ module AnnotateModels
       end
 
       def format_default(col_name, max_size, col_type, bare_type_allowance, attrs)
-        sprintf("#  %s:%s %s", mb_chars_ljust(col_name, max_size), mb_chars_ljust(col_type, bare_type_allowance),  attrs.join(", ")).rstrip + "\n"
+        format("#  %s:%s %s",
+               mb_chars_ljust(col_name, max_size),
+               mb_chars_ljust(col_type, bare_type_allowance),
+               attrs.join(", ")).rstrip + "\n"
       end
 
       def mb_chars_ljust(string, length)
         string = string.to_s
         padding = length - width(string)
-        if padding > 0
+        if padding.positive?
           string + (' ' * padding)
         else
-          string[0..length-1]
+          string[0..(length - 1)]
         end
       end
 
