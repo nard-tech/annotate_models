@@ -1,26 +1,13 @@
+require_relative './schema_info/index'
+
 module AnnotateModels
-  module SchemaInfo # rubocop:disable Metrics/ModuleLength
+  module SchemaInfo
     # Don't show default value for these column types
     NO_DEFAULT_COL_TYPES = %w[json jsonb hstore].freeze
 
     # Don't show limit (#) on these column types
     # Example: show "integer" instead of "integer(4)"
     NO_LIMIT_COL_TYPES = %w[integer bigint boolean].freeze
-
-    INDEX_CLAUSES = {
-      unique: {
-        default: 'UNIQUE',
-        markdown: '_unique_'
-      },
-      where: {
-        default: 'WHERE',
-        markdown: '_where_'
-      },
-      using: {
-        default: 'USING',
-        markdown: '_using_'
-      }
-    }.freeze
 
     END_MARK = '== Schema Information End'.freeze
 
@@ -81,7 +68,7 @@ module AnnotateModels
           # Check if the column has indices and print "indexed" if true
           # If the index includes another column, print it too.
           if options[:simple_indexes] && klass.table_exists? # Check out if this column is indexed
-            indices = retrieve_indexes_from_table(klass).select { |ind| ind.columns.include? col.name }
+            indices = Index.retrieve_indexes_from_table(klass).select { |ind| ind.columns.include? col.name }
             if indices
               indices.sort_by(&:name).each do |ind|
                 next if ind.columns.is_a?(String)
@@ -118,7 +105,7 @@ module AnnotateModels
           end
         end
 
-        info << get_index_info(klass, options) if options[:show_indexes] && klass.table_exists?
+        info << Index.generate(klass, options) if options[:show_indexes] && klass.table_exists?
 
         info << get_foreign_key_info(klass, options) if options[:show_foreign_keys] && klass.table_exists?
 
@@ -230,100 +217,6 @@ module AnnotateModels
           end
 
         excludes.include?(col_type)
-      end
-
-      def retrieve_indexes_from_table(klass)
-        table_name = klass.table_name
-        return [] unless table_name
-
-        indexes = klass.connection.indexes(table_name)
-        return indexes if indexes.any? || !klass.table_name_prefix
-
-        # Try to search the table without prefix
-        table_name_without_prefix = table_name.to_s.sub(klass.table_name_prefix, '')
-        klass.connection.indexes(table_name_without_prefix)
-      end
-
-      def get_index_info(klass, options = {})
-        index_info = if options[:format_markdown]
-                       "#\n# ### Indexes\n#\n"
-                     else
-                       "#\n# Indexes\n#\n"
-                     end
-
-        indexes = retrieve_indexes_from_table(klass)
-        return '' if indexes.empty?
-
-        max_size = indexes.collect { |index| index.name.size }.max + 1
-        indexes.sort_by(&:name).each do |index|
-          index_info << if options[:format_markdown]
-                          final_index_string_in_markdown(index)
-                        else
-                          final_index_string(index, max_size)
-                        end
-        end
-
-        index_info
-      end
-
-      def final_index_string_in_markdown(index)
-        details = format(
-          '%s%s%s',
-          index_unique_info(index, :markdown),
-          index_where_info(index, :markdown),
-          index_using_info(index, :markdown)
-        ).strip
-        details = " (#{details})" unless details.blank?
-
-        format(
-          "# * `%s`%s:\n#     * **`%s`**\n",
-          index.name,
-          details,
-          index_columns_info(index).join("`**\n#     * **`")
-        )
-      end
-
-      def final_index_string(index, max_size)
-        format(
-          "#  %-#{max_size}.#{max_size}s %s%s%s%s",
-          index.name,
-          "(#{index_columns_info(index).join(',')})",
-          index_unique_info(index),
-          index_where_info(index),
-          index_using_info(index)
-        ).rstrip + "\n"
-      end
-
-      def index_unique_info(index, format = :default)
-        index.unique ? " #{INDEX_CLAUSES[:unique][format]}" : ''
-      end
-
-      def index_where_info(index, format = :default)
-        value = index.try(:where).try(:to_s)
-        if value.blank?
-          ''
-        else
-          " #{INDEX_CLAUSES[:where][format]} #{value}"
-        end
-      end
-
-      def index_using_info(index, format = :default)
-        value = index.try(:using) && index.using.try(:to_sym)
-        if !value.blank? && value != :btree
-          " #{INDEX_CLAUSES[:using][format]} #{value}"
-        else
-          ''
-        end
-      end
-
-      def index_columns_info(index)
-        Array(index.columns).map do |col|
-          if index.try(:orders) && index.orders[col.to_s]
-            "#{col} #{index.orders[col.to_s].upcase}"
-          else
-            col.to_s.gsub("\r", '\r').gsub("\n", '\n')
-          end
-        end
       end
 
       def get_foreign_key_info(klass, options = {})
