@@ -2,48 +2,48 @@ module AnnotateModels
   # This module provides module method to get file paths.
   module FileUtils
     # Controller files
-    CONTROLLER_DIR = File.join('app', "controllers")
+    CONTROLLER_DIR = File.join('app', 'controllers')
 
     # Active admin registry files
-    ACTIVEADMIN_DIR = File.join('app', "admin")
+    ACTIVEADMIN_DIR = File.join('app', 'admin')
 
     # Helper files
-    HELPER_DIR = File.join('app', "helpers")
+    HELPER_DIR = File.join('app', 'helpers')
 
     # File.join for windows reverse bar compat?
     # I dont use windows, can`t test
-    UNIT_TEST_DIR    = File.join('test', "unit")
-    MODEL_TEST_DIR   = File.join('test', "models") # since rails 4.0
-    SPEC_MODEL_DIR   = File.join('spec', "models")
-    FIXTURE_TEST_DIR = File.join('test', "fixtures")
-    FIXTURE_SPEC_DIR = File.join('spec', "fixtures")
+    UNIT_TEST_DIR    = File.join('test', 'unit')
+    MODEL_TEST_DIR   = File.join('test', 'models') # since rails 4.0
+    SPEC_MODEL_DIR   = File.join('spec', 'models')
+    FIXTURE_TEST_DIR = File.join('test', 'fixtures')
+    FIXTURE_SPEC_DIR = File.join('spec', 'fixtures')
 
     # Other test files
-    CONTROLLER_TEST_DIR   = File.join('test', "controllers")
-    CONTROLLER_SPEC_DIR   = File.join('spec', "controllers")
-    REQUEST_SPEC_DIR      = File.join('spec', "requests")
-    ROUTING_SPEC_DIR      = File.join('spec', "routing")
+    CONTROLLER_TEST_DIR = File.join('test', 'controllers')
+    CONTROLLER_SPEC_DIR = File.join('spec', 'controllers')
+    REQUEST_SPEC_DIR    = File.join('spec', 'requests')
+    ROUTING_SPEC_DIR    = File.join('spec', 'routing')
 
     # Object Daddy http://github.com/flogic/object_daddy/tree/master
-    EXEMPLARS_TEST_DIR    = File.join('test', "exemplars")
-    EXEMPLARS_SPEC_DIR    = File.join('spec', "exemplars")
+    EXEMPLARS_TEST_DIR = File.join('test', 'exemplars')
+    EXEMPLARS_SPEC_DIR = File.join('spec', 'exemplars')
 
     # Machinist http://github.com/notahat/machinist
-    BLUEPRINTS_TEST_DIR   = File.join('test', "blueprints")
-    BLUEPRINTS_SPEC_DIR   = File.join('spec', "blueprints")
+    BLUEPRINTS_TEST_DIR = File.join('test', 'blueprints')
+    BLUEPRINTS_SPEC_DIR = File.join('spec', 'blueprints')
 
     # FactoryBot https://github.com/thoughtbot/factory_bot
-    FACTORY_BOT_TEST_DIR = File.join('test', "factories")
-    FACTORY_BOT_SPEC_DIR = File.join('spec', "factories")
+    FACTORY_BOT_TEST_DIR = File.join('test', 'factories')
+    FACTORY_BOT_SPEC_DIR = File.join('spec', 'factories')
 
     # Fabrication https://github.com/paulelliott/fabrication.git
-    FABRICATORS_TEST_DIR  = File.join('test', "fabricators")
-    FABRICATORS_SPEC_DIR  = File.join('spec', "fabricators")
+    FABRICATORS_TEST_DIR = File.join('test', 'fabricators')
+    FABRICATORS_SPEC_DIR = File.join('spec', 'fabricators')
 
     # Serializers https://github.com/rails-api/active_model_serializers
-    SERIALIZERS_DIR       = File.join('app',  "serializers")
-    SERIALIZERS_TEST_DIR  = File.join('test', "serializers")
-    SERIALIZERS_SPEC_DIR  = File.join('spec', "serializers")
+    SERIALIZERS_DIR      = File.join('app',  'serializers')
+    SERIALIZERS_TEST_DIR = File.join('test', 'serializers')
+    SERIALIZERS_SPEC_DIR = File.join('spec', 'serializers')
 
     class << self
       def by_pattern(root_directory, pattern_type, options)
