@@ -347,10 +347,10 @@ describe AnnotateModels::SchemaInfo do
                 context 'when one of indexes includes orderd index key' do
                   let :columns do
                     [
-                      mock_column("id", :integer),
-                      mock_column("firstname", :string),
-                      mock_column("surname", :string),
-                      mock_column("value", :string)
+                      mock_column('id', :integer),
+                      mock_column('firstname', :string),
+                      mock_column('surname', :string),
+                      mock_column('value', :string)
                     ]
                   end
 
@@ -390,10 +390,10 @@ describe AnnotateModels::SchemaInfo do
                 context 'when one of indexes includes "where" clause' do
                   let :columns do
                     [
-                      mock_column("id", :integer),
-                      mock_column("firstname", :string),
-                      mock_column("surname", :string),
-                      mock_column("value", :string)
+                      mock_column('id', :integer),
+                      mock_column('firstname', :string),
+                      mock_column('surname', :string),
+                      mock_column('value', :string)
                     ]
                   end
 
@@ -433,10 +433,10 @@ describe AnnotateModels::SchemaInfo do
                 context 'when one of indexes includes "using" clause other than "btree"' do
                   let :columns do
                     [
-                      mock_column("id", :integer),
-                      mock_column("firstname", :string),
-                      mock_column("surname", :string),
-                      mock_column("value", :string)
+                      mock_column('id', :integer),
+                      mock_column('firstname', :string),
+                      mock_column('surname', :string),
+                      mock_column('value', :string)
                     ]
                   end
 
@@ -545,8 +545,8 @@ describe AnnotateModels::SchemaInfo do
                 context 'when one of indexes is in string form' do
                   let :columns do
                     [
-                      mock_column("id", :integer),
-                      mock_column("name", :string)
+                      mock_column('id', :integer),
+                      mock_column('name', :string)
                     ]
                   end
 
