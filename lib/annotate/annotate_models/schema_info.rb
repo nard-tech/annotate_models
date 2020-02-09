@@ -79,12 +79,11 @@ module AnnotateModels
           # If the index includes another column, print it too.
           if options[:simple_indexes] && klass.table_exists? # Check out if this column is indexed
             indices = retrieve_indexes_from_table(klass)
-            if indices = indices.select { |ind| ind.columns.include? col.name }
-              indices.sort_by(&:name).each do |ind|
-                next if ind.columns.is_a?(String)
-                ind = ind.columns.reject! { |i| i == col.name }
-                attrs << (ind.empty? ? 'indexed' : "indexed => [#{ind.join(', ')}]")
-              end
+            indices.select { |ind| ind.columns.include? col.name }&.sort_by(&:name)&.each do |ind|
+              next if ind.columns.is_a?(String)
+
+              ind = ind.columns.reject! { |i| i == col.name }
+              attrs << (ind.empty? ? 'indexed' : "indexed => [#{ind.join(', ')}]")
             end
           end
           col_name = if with_comments?(klass, options) && col.comment
