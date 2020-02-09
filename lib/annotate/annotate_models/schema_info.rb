@@ -83,7 +83,7 @@ module AnnotateModels
               indices.sort_by(&:name).each do |ind|
                 next if ind.columns.is_a?(String)
                 ind = ind.columns.reject! { |i| i == col.name }
-                attrs << (ind.empty? ? 'indexed' : "indexed => [#{ind.join(", ")}]")
+                attrs << (ind.empty? ? 'indexed' : "indexed => [#{ind.join(', ')}]")
               end
             end
           end
