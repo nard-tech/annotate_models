@@ -55,14 +55,16 @@ module AnnotateModels
     end
 
     def get_schema_footer_text
-      info = ''
+      rows = []
       if rdoc?
-        info << "#--\n"
-        info << "# #{END_MARK}\n"
-        info << "#++\n"
+        rows << '#--'
+        rows << "# #{END_MARK}"
+        rows << '#++'
       else
-        info << "#\n"
+        rows << '#'
       end
+      rows << ''
+      rows.join("\n")
     end
 
     def table_exists?
