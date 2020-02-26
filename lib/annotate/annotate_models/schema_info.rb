@@ -28,6 +28,7 @@ module AnnotateModels
 
     def generate
       info = "# #{header}\n"
+      info << "#\n"
       info << get_schema_header_text
 
       info << Column.generate(klass, options)
@@ -43,7 +44,7 @@ module AnnotateModels
     private
 
     def get_schema_header_text
-      info = "#\n"
+      info = ""
       if markdown?
         info << "# Table name: `#{table_name}`\n"
       else
