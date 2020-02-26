@@ -44,13 +44,15 @@ module AnnotateModels
     private
 
     def get_schema_header_text
-      info = ""
+      rows = []
       if markdown?
-        info << "# Table name: `#{table_name}`\n"
+        rows << "# Table name: `#{table_name}`"
       else
-        info << "# Table name: #{table_name}\n"
+        rows << "# Table name: #{table_name}"
       end
-      info << "#\n"
+      rows << '#'
+      rows << ''
+      rows.join("\n")
     end
 
     def get_schema_footer_text
