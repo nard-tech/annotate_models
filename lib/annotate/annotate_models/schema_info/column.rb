@@ -10,6 +10,7 @@ module AnnotateModels
 
       MD_NAMES_OVERHEAD = 6
       MD_TYPE_ALLOWANCE = 18
+      BARE_TYPE_ALLOWANCE = 16
 
       class << self
         def generate(klass, options)
@@ -103,8 +104,7 @@ module AnnotateModels
                            ' ',
                            attrs.join(', ').rstrip).gsub('``', '  ').rstrip + "\n"
           else
-            bare_type_allowance = 16
-            info << format_default(col_name, max_size, col_type, bare_type_allowance, attrs)
+            info << format_default(col_name, max_size, col_type, attrs)
           end
 
           info
@@ -272,10 +272,10 @@ module AnnotateModels
           string.to_s.chars.reject(&:ascii_only?).length
         end
 
-        def format_default(col_name, max_size, col_type, bare_type_allowance, attrs)
+        def format_default(col_name, max_size, col_type, attrs)
           format('#  %s:%s %s',
                  mb_chars_ljust(col_name, max_size),
-                 mb_chars_ljust(col_type, bare_type_allowance),
+                 mb_chars_ljust(col_type, BARE_TYPE_ALLOWANCE),
                  attrs.join(', ')).rstrip + "\n"
         end
 
