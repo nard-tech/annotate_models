@@ -45,11 +45,7 @@ module AnnotateModels
 
     def table_name_in_header
       rows = []
-      if markdown?
-        rows << "# Table name: `#{table_name}`"
-      else
-        rows << "# Table name: #{table_name}"
-      end
+      rows << (markdown? ? "# Table name: `#{table_name}`" : "# Table name: #{table_name}")
       rows << '#'
       rows << ''
       rows.join("\n")
