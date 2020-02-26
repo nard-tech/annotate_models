@@ -8,6 +8,7 @@ module AnnotateModels
       # Example: show "integer" instead of "integer(4)"
       NO_LIMIT_COL_TYPES = %w[integer bigint boolean].freeze
 
+      MD_NAMES_OVERHEAD = 6
       MD_TYPE_ALLOWANCE = 18
 
       class << self
@@ -15,14 +16,13 @@ module AnnotateModels
           info = ''
 
           max_size = max_schema_info_width(klass, options)
-          md_names_overhead = 6
 
           if options[:format_markdown]
-            info << format("# %-#{max_size + md_names_overhead}.#{max_size + md_names_overhead}s | %-#{MD_TYPE_ALLOWANCE}.#{MD_TYPE_ALLOWANCE}s | %s\n",
+            info << format("# %-#{max_size + MD_NAMES_OVERHEAD}.#{max_size + MD_NAMES_OVERHEAD}s | %-#{MD_TYPE_ALLOWANCE}.#{MD_TYPE_ALLOWANCE}s | %s\n",
                            'Name',
                            'Type',
                            'Attributes')
-            info << "# #{'-' * (max_size + md_names_overhead)} | #{'-' * MD_TYPE_ALLOWANCE} | #{'-' * 27}\n"
+            info << "# #{'-' * (max_size + MD_NAMES_OVERHEAD)} | #{'-' * MD_TYPE_ALLOWANCE} | #{'-' * 27}\n"
           end
 
           cols = columns(klass, options)
