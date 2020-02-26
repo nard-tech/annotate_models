@@ -32,9 +32,9 @@ module AnnotateModels
 
       info << Column.generate(klass, options)
 
-      if klass.table_exists?
-        info << Index.generate(klass, options) if options[:show_indexes]
-        info << ForeignKey.generate(klass, options) if options[:show_foreign_keys]
+      if table_exists?
+        info << Index.generate(klass, options) if show_indexes?
+        info << ForeignKey.generate(klass, options) if show_foreign_keys?
       end
 
       info << get_schema_footer_text
@@ -44,25 +44,49 @@ module AnnotateModels
 
     def get_schema_header_text
       info = "#\n"
-      if options[:format_markdown]
-        info << "# Table name: `#{klass.table_name}`\n"
+      if markdown?
+        info << "# Table name: `#{table_name}`\n"
         info << "#\n"
         info << "# ### Columns\n"
       else
-        info << "# Table name: #{klass.table_name}\n"
+        info << "# Table name: #{table_name}\n"
       end
       info << "#\n"
     end
 
     def get_schema_footer_text
       info = ''
-      if options[:format_rdoc]
+      if rdoc?
         info << "#--\n"
         info << "# #{END_MARK}\n"
         info << "#++\n"
       else
         info << "#\n"
       end
+    end
+
+    def table_exists?
+      klass.table_exists?
+    end
+
+    def show_indexes?
+      options[:show_indexes]
+    end
+
+    def show_foreign_keys?
+      options[:show_foreign_keys]
+    end
+
+    def markdown?
+      options[:format_markdown]
+    end
+
+    def rdoc?
+      options[:format_rdoc]
+    end
+
+    def table_name
+      klass.table_name
     end
   end
 end
