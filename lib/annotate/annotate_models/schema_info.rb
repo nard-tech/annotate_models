@@ -17,9 +17,10 @@ module AnnotateModels
 
         info << Column.generate(klass, options)
 
-        info << Index.generate(klass, options) if options[:show_indexes] && klass.table_exists?
-
-        info << ForeignKey.generate(klass, options) if options[:show_foreign_keys] && klass.table_exists?
+        if klass.table_exists?
+          info << Index.generate(klass, options) if options[:show_indexes]
+          info << ForeignKey.generate(klass, options) if options[:show_foreign_keys]
+        end
 
         info << get_schema_footer_text(klass, options)
       end
