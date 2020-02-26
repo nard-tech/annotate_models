@@ -1,5 +1,5 @@
 module AnnotateModels
-  module SchemaInfo
+  class SchemaInfo
     module Column
       # Don't show default value for these column types
       NO_DEFAULT_COL_TYPES = %w[json jsonb hstore].freeze

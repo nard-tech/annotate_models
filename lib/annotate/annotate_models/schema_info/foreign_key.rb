@@ -1,5 +1,5 @@
 module AnnotateModels
-  module SchemaInfo
+  class SchemaInfo
     module ForeignKey
       class << self
         def generate(klass, options = {})

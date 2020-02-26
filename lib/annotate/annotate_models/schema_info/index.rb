@@ -1,5 +1,5 @@
 module AnnotateModels
-  module SchemaInfo
+  class SchemaInfo
     module Index
       INDEX_CLAUSES = {
         unique: {
