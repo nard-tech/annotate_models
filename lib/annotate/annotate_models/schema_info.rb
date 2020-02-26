@@ -46,8 +46,6 @@ module AnnotateModels
       info = "#\n"
       if markdown?
         info << "# Table name: `#{table_name}`\n"
-        info << "#\n"
-        info << "# ### Columns\n"
       else
         info << "# Table name: #{table_name}\n"
       end

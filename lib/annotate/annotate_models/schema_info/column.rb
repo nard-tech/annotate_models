@@ -19,6 +19,8 @@ module AnnotateModels
           max_size = max_schema_info_width(klass, options)
 
           if options[:format_markdown]
+            info << "# ### Columns\n"
+            info << "#\n"
             info << format("# %-#{max_size + MD_NAMES_OVERHEAD}.#{max_size + MD_NAMES_OVERHEAD}s | %-#{MD_TYPE_ALLOWANCE}.#{MD_TYPE_ALLOWANCE}s | %s\n",
                            'Name',
                            'Type',
