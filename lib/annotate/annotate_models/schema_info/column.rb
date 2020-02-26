@@ -8,31 +8,32 @@ module AnnotateModels
       # Example: show "integer" instead of "integer(4)"
       NO_LIMIT_COL_TYPES = %w[integer bigint boolean].freeze
 
+      MD_TYPE_ALLOWANCE = 18
+
       class << self
         def generate(klass, options)
           info = ''
 
           max_size = max_schema_info_width(klass, options)
           md_names_overhead = 6
-          md_type_allowance = 18
 
           if options[:format_markdown]
-            info << format("# %-#{max_size + md_names_overhead}.#{max_size + md_names_overhead}s | %-#{md_type_allowance}.#{md_type_allowance}s | %s\n",
+            info << format("# %-#{max_size + md_names_overhead}.#{max_size + md_names_overhead}s | %-#{MD_TYPE_ALLOWANCE}.#{MD_TYPE_ALLOWANCE}s | %s\n",
                            'Name',
                            'Type',
                            'Attributes')
-            info << "# #{'-' * (max_size + md_names_overhead)} | #{'-' * md_type_allowance} | #{'-' * 27}\n"
+            info << "# #{'-' * (max_size + md_names_overhead)} | #{'-' * MD_TYPE_ALLOWANCE} | #{'-' * 27}\n"
           end
 
           cols = columns(klass, options)
           cols.each do |col|
-            info << generate_for_each_col(klass, options, max_size, col, md_type_allowance)
+            info << generate_for_each_col(klass, options, max_size, col)
           end
 
           info
         end
 
-        def generate_for_each_col(klass, options, max_size, col, md_type_allowance)
+        def generate_for_each_col(klass, options, max_size, col)
           col_type = get_col_type(col)
 
           attrs = []
@@ -94,7 +95,7 @@ module AnnotateModels
             info << sprintf("#   @return [#{ruby_class}]") + "\n"
           elsif options[:format_markdown]
             name_remainder = max_size - col_name.length - non_ascii_length(col_name)
-            type_remainder = (md_type_allowance - 2) - col_type.length
+            type_remainder = (MD_TYPE_ALLOWANCE - 2) - col_type.length
             info << format("# **`%s`**%#{name_remainder}s | `%s`%#{type_remainder}s | `%s`",
                            col_name,
                            ' ',
