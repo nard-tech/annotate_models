@@ -147,7 +147,8 @@ describe AnnotateModels do
     let(:options) do
       {
         root_dir: '/root',
-        model_dir: 'app/models,app/one,  app/two   ,,app/three'
+        model_dir: 'app/models,app/one,  app/two   ,,app/three',
+        skip_subdirectory_model_load: false
       }
     end
 
@@ -172,6 +173,40 @@ describe AnnotateModels do
 
       it 'separates option "model_dir" with commas and sets @model_dir as an array of string' do
         is_expected.to eq(['app/models', 'app/one', 'app/two', 'app/three'])
+      end
+    end
+
+    describe '@skip_subdirectory_model_load' do
+      subject do
+        AnnotateModels.instance_variable_get(:@skip_subdirectory_model_load)
+      end
+
+      context 'option is set to true' do
+        let(:options) do
+          {
+            root_dir: '/root',
+            model_dir: 'app/models,app/one,  app/two   ,,app/three',
+            skip_subdirectory_model_load: true
+          }
+        end
+
+        it 'sets skip_subdirectory_model_load to true' do
+          is_expected.to eq(true)
+        end
+      end
+
+      context 'option is set to false' do
+        let(:options) do
+          {
+            root_dir: '/root',
+            model_dir: 'app/models,app/one,  app/two   ,,app/three',
+            skip_subdirectory_model_load: false
+          }
+        end
+
+        it 'sets skip_subdirectory_model_load to false' do
+          is_expected.to eq(false)
+        end
       end
     end
   end
@@ -1629,38 +1664,6 @@ describe AnnotateModels do
     end
   end
 
-  describe '.files_by_pattern' do
-    subject { AnnotateModels.files_by_pattern(root_directory, pattern_type, options) }
-
-    context 'when pattern_type is "additional_file_patterns"' do
-      let(:root_directory) { nil }
-      let(:pattern_type) { 'additional_file_patterns' }
-
-      context 'when additional_file_patterns is specified in the options' do
-        let(:additional_file_patterns) do
-          [
-            '%PLURALIZED_MODEL_NAME%/**/*.rb',
-            '%PLURALIZED_MODEL_NAME%/*_form'
-          ]
-        end
-
-        let(:options) { { additional_file_patterns: additional_file_patterns } }
-
-        it 'returns additional_file_patterns in the argument "options"' do
-          is_expected.to eq(additional_file_patterns)
-        end
-      end
-
-      context 'when additional_file_patterns is not specified in the options' do
-        let(:options) { {} }
-
-        it 'returns an empty array' do
-          is_expected.to eq([])
-        end
-      end
-    end
-  end
-
   describe '.get_patterns' do
     subject { AnnotateModels.get_patterns(options, pattern_type) }
 
@@ -1968,7 +1971,7 @@ describe AnnotateModels do
       end
     end
 
-    context 'when the file includes invlaid multibyte chars (USASCII)' do
+    context 'when the file includes invalid multibyte chars (USASCII)' do
       context 'when class FooWithUtf8 is defined in "foo_with_utf8.rb"' do
         let :filename do
           'foo_with_utf8.rb'
@@ -2106,7 +2109,7 @@ describe AnnotateModels do
 
         let :file_content_2 do
           <<-EOS
-            class Bar::Foo
+            class Bar::Foo < ActiveRecord::Base
             end
           EOS
         end
@@ -2118,6 +2121,54 @@ describe AnnotateModels do
         it 'finds valid model' do
           expect(klass.name).to eq('Foo')
           expect(klass_2.name).to eq('Bar::Foo')
+        end
+      end
+
+      context 'the class name and base name clash' do
+        let :filename do
+          'foo.rb'
+        end
+
+        let :file_content do
+          <<-EOS
+            class Foo < ActiveRecord::Base
+            end
+          EOS
+        end
+
+        let :filename_2 do
+          'bar/foo.rb'
+        end
+
+        let :file_content_2 do
+          <<-EOS
+            class Bar::Foo < ActiveRecord::Base
+            end
+          EOS
+        end
+
+        let :klass_2 do
+          AnnotateModels.get_model_class(File.join(AnnotateModels.model_dir[0], filename_2))
+        end
+
+        it 'finds valid model' do
+          expect(klass.name).to eq('Foo')
+          expect(klass_2.name).to eq('Bar::Foo')
+        end
+
+        it 'attempts to load the model path without expanding if skip_subdirectory_model_load is false' do
+          allow(AnnotateModels).to receive(:skip_subdirectory_model_load).and_return(false)
+          full_path = File.join(AnnotateModels.model_dir[0], filename_2)
+          expect(File).to_not receive(:expand_path).with(full_path)
+          AnnotateModels.get_model_class(full_path)
+        end
+
+        it 'does not attempt to load the model path without expanding if skip_subdirectory_model_load is true' do
+          $LOAD_PATH.unshift(AnnotateModels.model_dir[0])
+          allow(AnnotateModels).to receive(:skip_subdirectory_model_load).and_return(true)
+          full_path = File.join(AnnotateModels.model_dir[0], filename_2)
+          expect(File).to receive(:expand_path).with(full_path).and_call_original
+          AnnotateModels.get_model_class(full_path)
         end
       end
 
@@ -2140,7 +2191,7 @@ describe AnnotateModels do
         let :file_content_2 do
           <<~EOS
             class Voucher
-              class Foo
+              class Foo < ActiveRecord::Base
               end
             end
           EOS
